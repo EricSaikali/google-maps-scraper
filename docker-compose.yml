@@ -11,8 +11,8 @@ services:
     volumes:
       - .:/app # Mount current directory to /app in container
     working_dir: /app # Set working directory to mounted volume
-    networks:
-      - shark
+    # networks:
+    #   - shark
     # Optional: Add environment variables if needed for configuration
     # environment:
     #   - HEADLESS_MODE=true
