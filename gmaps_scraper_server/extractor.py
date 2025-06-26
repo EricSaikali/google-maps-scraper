@@ -247,6 +247,32 @@ def get_thumbnail(data):
 # Add more extraction functions here as needed, using the indices
 # from omkarcloud/src/extract_data.py as a reference, BUT VERIFYING against debug_inner_data.json
 
+def get_reviews(data_blob):
+    """
+    Extracts reviews from the data blob at known index path [52][1][0].
+    Returns a list of dicts with author name (if found), text, and rating.
+    """
+    raw_reviews = safe_get(data_blob, 52, 1, 0)
+    if not isinstance(raw_reviews, list):
+        return None
+
+    reviews = []
+    for r in raw_reviews:
+        if not isinstance(r, list):
+            continue
+        review = {
+            "author_url": safe_get(r, 0, 0),
+            "profile_pic": safe_get(r, 0, 2),
+            "text": safe_get(r, 1),
+            "rating": safe_get(r, 10),
+            "author_id": safe_get(r, 9),
+        }
+        if any(review.values()):
+            reviews.append(review)
+
+    return reviews if reviews else None
+
+
 def extract_place_data(html_content):
     """
     High-level function to orchestrate extraction from HTML content.
@@ -282,6 +308,7 @@ def extract_place_data(html_content):
         "website": get_website(data_blob),
         "phone": get_phone_number(data_blob), # Needs index verification
         "thumbnail": get_thumbnail(data_blob), # Needs index verification
+        "reviews": get_reviews(data_blob),
         # Add other fields as needed
     }
 
