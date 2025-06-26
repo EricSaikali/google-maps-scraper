@@ -261,6 +261,15 @@ def extract_place_data(html_content):
         print("Failed to parse JSON data or find expected structure.")
         return None
 
+    # Dump data_blob for review path analysis
+    try:
+        with open("data_blob_dump.json", "w", encoding="utf-8") as f:
+            json.dump(data_blob, f, indent=2)
+        print("...Saved data_blob_dump.json for inspection")
+    except Exception as e:
+        print(f"Error saving data_blob_dump.json: {e}")
+
+
     # Now extract individual fields using the helper functions
     place_details = {
         "name": get_main_name(data_blob),
