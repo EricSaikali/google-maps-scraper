@@ -65,12 +65,27 @@ async def scrape_google_maps(query, max_places=None, lang="en", headless=True): 
             # --- Handle potential consent forms ---
             # This is a common pattern, might need adjustment based on specific consent popups
             try:
-                consent_button_xpath = "//button[.//span[contains(text(), 'Accept all') or contains(text(), 'Reject all')]]"
-                # Wait briefly for the button to potentially appear
+                consent_button_xpath = """
+                  //button[
+                       .//span[
+                           contains(text(), 'Accept all')
+                        or contains(text(), 'Reject all')
+                        or contains(text(), 'Accepter tout')
+                        or contains(text(), 'Tout refuser')
+                        or contains(text(), 'Alle akzeptieren')
+                        or contains(text(), 'Alle ablehnen')
+                       ]
+                  ]
+                """                # Wait briefly for the button to potentially appear
                 await page.wait_for_selector(consent_button_xpath, state='visible', timeout=5000) # Added await
                 # Click the "Accept all" or equivalent button if found
                 # Example: Prioritize "Accept all"
-                accept_button = await page.query_selector("//button[.//span[contains(text(), 'Accept all')]]") # Added await
+                # accept_button = await page.query_selector("//button[.//span[contains(text(), 'Accept all')]]") # Added await
+                accept_button = (
+                        await page.query_selector("//button[.//span[contains(text(), 'Accept all')]]")
+                        or await page.query_selector("//button[.//span[contains(text(), 'Accepter tout')]]")
+                        or await page.query_selector("//button[.//span[contains(text(), 'Alle akzeptieren')]]")
+                )
                 if accept_button:
                     print("Accepting consent form...")
                     await accept_button.click() # Added await
